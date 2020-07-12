@@ -2,45 +2,54 @@ import React from 'react'
 
 import Button from '../../UI/Button/Button'
 
-const OrderSummary = ({
-    ingredients,
-    removeModal,
-    checkout
-}) => {
-    const ingredientSummary = Object.keys(ingredients).map(igKey => < li key = {
-        igKey
-    } > < span style = {
-        {
-            textTransform: 'capitalize'
-        }
-    } > {
-        igKey
-    } < /span>: {ingredients[igKey]} </li > )
+class OrderSummary extends React.Component {
+    render() {
+        const {
+            ingredients,
+            removeModal,
+            checkout,
+            price
+        } = this.props;
 
-    return ( <
-        React.Fragment >
-        <
-        h3 > Your Order < /h3> <
-        p > Your burger has the following ingredients < /p>
+        const ingredientSummary = Object.keys(ingredients).map(igKey => < li key = {
+            igKey
+        } > < span style = {
+            {
+                textTransform: 'capitalize'
+            }
+        } > {
+            igKey
+        } < /span>: {ingredients[igKey]} </li > )
 
-        <
-        ul > {
-            ingredientSummary
-        } <
-        /ul>
+        return ( <
+            React.Fragment >
+            <
+            h3 > Your Order < /h3> <
+            p > Your burger has the following ingredients < /p>
 
-        <
-        p > Continue to Checkout < /p> <
-        Button type = 'Danger'
-        clicked = {
-            removeModal
-        } > CANCEL < /Button> <
-        Button type = 'Success'
-        clicked = {
-            checkout
-        } > CONTINUE < /Button> <
-        /React.Fragment>
-    )
+            <
+            ul > {
+                ingredientSummary
+            } <
+            /ul>
+
+            <
+            p > < strong > Total Price: $ {
+                price.toFixed(2)
+            } < /strong> </p >
+            <
+            p > Continue to Checkout < /p> <
+            Button type = 'Danger'
+            clicked = {
+                removeModal
+            } > CANCEL < /Button> <
+            Button type = 'Success'
+            clicked = {
+                checkout
+            } > CONTINUE < /Button> <
+            /React.Fragment>
+        )
+    }
 }
 
 export default OrderSummary

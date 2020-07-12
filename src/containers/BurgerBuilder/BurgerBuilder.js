@@ -94,7 +94,7 @@ class BurgerBuilder extends React.Component {
     }
 
     checkoutHandler = () => {
-        console.log('continue')
+        alert('Checkout form')
     }
 
     render() {
@@ -124,6 +124,9 @@ class BurgerBuilder extends React.Component {
             }
             checkout = {
                 this.checkoutHandler
+            }
+            price = {
+                this.state.totalPrice
             }
             /> <
             /Modal> <

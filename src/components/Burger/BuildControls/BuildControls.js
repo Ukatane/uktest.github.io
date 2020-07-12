@@ -33,7 +33,7 @@ const BuildControls = ({
         classes.BuildControls
     } >
     <
-    p > Current Price: < strong > {
+    p > Current Price: < strong > $ {
         price.toFixed(2)
     } < /strong> </p >
 
