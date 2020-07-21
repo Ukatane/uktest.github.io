@@ -3,5 +3,11 @@
         "activityBar.background": "#203034",
         "titleBar.activeBackground": "#2C4349",
         "titleBar.activeForeground": "#F8FAFB"
-    }
+    },
+    "cSpell.words": [
+        "ikey",
+        "ingr",
+        "inputtype",
+        "zipcode"
+    ]
 }

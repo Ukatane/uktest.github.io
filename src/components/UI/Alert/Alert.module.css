@@ -1,0 +1,49 @@
+.Alert {
+  position: fixed;
+  top: 5rem;
+  left: 80%;
+  width: 260px;
+  max-width: 40%;
+  height: 70px;
+  z-index: 100;
+  border-radius: 10px;
+  background-color: #57557d;
+  padding: 0 14px;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  transition: transform 0.4s ease-in-out;
+  cursor: pointer;
+  box-shadow: 5px 6px 6px #91b0b5;
+}
+
+.Open {
+  transform: translateX(0);
+}
+
+.Close {
+  transform: translateX(1000%);
+}
+
+.AlertMsg {
+  width: 100%;
+  text-align: center;
+  padding: 0px 10px;
+  box-sizing: border-box;
+}
+
+.AlertMsg p {
+  line-height: 1.4em;
+  font-size: 16px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+}
+
+@media (max-width: 500px) {
+  .Alert {
+    width: 50%;
+    left: 50%;
+    box-shadow: 2px 4px 5px #57557d;
+  }
+}

@@ -1,0 +1,65 @@
+import React, { Component } from 'react';
+import { Route } from 'react-router-dom';
+
+import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary';
+import ContactData from './ContactData/ContactData';
+
+class Checkout extends Component {
+  state = {
+    ingredients: null,
+    price: null,
+  };
+
+  componentDidMount() {
+    const query = new URLSearchParams(this.props.location.search);
+    const ingredients = {};
+    let price = 0;
+
+    for (let param of query.entries()) {
+      if (param[0] === 'price') {
+        price = +param[1];
+      } else {
+        ingredients[param[0]] = +param[1];
+      }
+    }
+
+    this.setState({ ingredients, price });
+  }
+
+  cancelCheckoutHandler = () => this.props.history.goBack();
+
+  continueCheckoutHandler = () =>
+    this.props.history.replace('/checkout/contact-data');
+
+  render() {
+    let checkout = <div>Loading...</div>;
+
+    if (this.state.ingredients) {
+      checkout = (
+        <CheckoutSummary
+          ingredients={this.state.ingredients}
+          cancelCheckout={this.cancelCheckoutHandler}
+          continueCheckout={this.continueCheckoutHandler}
+        />
+      );
+    }
+
+    return (
+      <React.Fragment>
+        {checkout}
+        <Route
+          path={`${this.props.match.url}/contact-data`}
+          exact
+          render={() => (
+            <ContactData
+              ingredients={this.state.ingredients}
+              price={this.state.price}
+            />
+          )}
+        />
+      </React.Fragment>
+    );
+  }
+}
+
+export default Checkout;

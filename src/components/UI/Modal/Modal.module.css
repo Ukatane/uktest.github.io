@@ -1,25 +1,51 @@
 .Modal {
-    position: fixed;
-    z-index: 500;
-    background-color: white;
-    width: 100%;
-    border: none;
-    border-top-left-radius: 30px;
-    border-top-right-radius: 30px;
-    box-shadow: 1px 1px 1px black;
-    padding: 16px;
-    left: 0;
-    bottom: 0;
-    box-sizing: border-box;
-    transition: all 0.3s ease-out;
+  position: fixed;
+  z-index: 500;
+  background-color: white;
+  width: 100%;
+  border: none;
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  box-shadow: 1px 1px 1px black;
+  padding: 16px;
+  left: 0;
+  bottom: 0;
+  box-sizing: border-box;
+  transition: all 0.3s ease-out;
+}
+
+.Open {
+  transform: translateY(0);
+}
+
+.Opacity-1 {
+  opacity: 1;
+}
+
+.Opacity-0 {
+  opacity: 0;
+}
+
+.Icon {
+  cursor: pointer;
+}
+
+.Trans {
+  transform: translateY(100%);
 }
 
 @media (min-width: 600px) {
-    .Modal {
-        width: 500px;
-        left: calc(50% - 250px);
-        border: 1px solid #ccc;
-        left: 15%;
-        top: 30%;
-    }
+  .Modal {
+    width: 500px;
+    left: calc(50% - 250px);
+    border: 1px solid #ccc;
+    border-radius: 0;
+    left: 30%;
+    top: 30%;
+    bottom: auto;
+  }
+
+  .Trans {
+    transform: translateY(-100vh);
+  }
 }

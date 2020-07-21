@@ -1,17 +1,13 @@
-import React from 'react'
+import React from 'react';
 
-import classes from './NavigationItems.module.css'
+import classes from './NavigationItems.module.css';
 import NavigationItem from './NavigationItem/NavigationItem';
 
-const NavigationItems = () => ( <
-    ul className = {
-        classes.NavigationItems
-    } >
-    <
-    NavigationItem href = "/"
-    active > Burger Builder < /NavigationItem> <
-    NavigationItem href = '/' > Checkout < /NavigationItem> <
-    /ul>
-)
+const NavigationItems = () => (
+  <ul className={classes.NavigationItems}>
+    <NavigationItem href='/'> Burger Builder </NavigationItem>
+    <NavigationItem href='/orders'> Orders </NavigationItem>
+  </ul>
+);
 
-export default NavigationItems
+export default NavigationItems;

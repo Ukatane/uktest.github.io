@@ -12,29 +12,16 @@ const SideDrawer = props => {
         sideDrawer = [classes.SideDrawer, classes.Open]
     }
 
-    return ( <
-        React.Fragment >
-        <
-        Backdrop show = {
-            props.show
-        }
-        removeModal = {
-            props.clicked
-        }
-        /> <
-        div className = {
-            sideDrawer.join(' ')
-        } >
-        <
-        Logo height = '11%' / >
-        <
-        nav >
-        <
-        NavigationItems / >
-        <
-        /nav> <
-        /div> <
-        /React.Fragment>
+    return (
+        <React.Fragment>
+            <Backdrop show={props.show} removeModal={props.clicked} />
+            <div className={sideDrawer.join(' ')}>
+                <Logo height='11%' />
+                <nav>
+                    <NavigationItems />
+                </nav>
+            </div>
+        </React.Fragment>
     )
 }
 
