@@ -28,8 +28,8 @@ const Order = props => {
   let ingredients = [];
 
   // ingred should be props.ingredients
-  for (let ing in ingred) {
-    ingredients.push([ing, ingred[ing]]);
+  for (let ing in props.ingredients) {
+    ingredients.push([ing, props.ingredients[ing]]);
   }
 
   const showIngredients = ingredients.map(igKey => {

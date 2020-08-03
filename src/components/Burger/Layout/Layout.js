@@ -1,30 +1,36 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react';
+import { connect } from 'react-redux';
 
-import classes from './Layout.module.css'
+import classes from './Layout.module.css';
 import Toolbar from '../../Navigation/Toolbar/Toolbar';
 import SideDrawer from '../../Navigation/SideDrawer/SideDrawer';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, isAuthenticated }) => {
+  const [show, setShow] = useState(false);
 
-    const [show, setShow] = useState(false)
+  const removeBackdrop = () => {
+    setShow(false);
+  };
 
-    const removeBackdrop = () => {
-        setShow(false)
-    }
+  const toggleSideDrawer = () => {
+    setShow(!show);
+  };
 
-    const toggleSideDrawer = () => {
-        setShow(!show)
-    }
-
-    return (
+  return (
     <React.Fragment>
-        <Toolbar clicked={toggleSideDrawer} />
-        <SideDrawer show={show} clicked={removeBackdrop} />
-        <main className={classes.Content}>
-            {children}
-        </main>
+      <Toolbar clicked={toggleSideDrawer} isAuth={isAuthenticated} />
+      <SideDrawer
+        show={show}
+        clicked={removeBackdrop}
+        isAuth={isAuthenticated}
+      />
+      <main className={classes.Content}>{children}</main>
     </React.Fragment>
-    )
-}
+  );
+};
 
-export default Layout
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.token !== null,
+});
+
+export default connect(mapStateToProps)(Layout);

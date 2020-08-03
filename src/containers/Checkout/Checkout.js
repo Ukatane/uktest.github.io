@@ -1,17 +1,18 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Route } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import CheckoutSummary from '../../components/Order/CheckoutSummary/CheckoutSummary';
 import ContactData from './ContactData/ContactData';
 
-class Checkout extends Component {
-  state = {
+const Checkout = props => {
+  const [state, setState] = useState({
     ingredients: null,
-    price: null,
-  };
+    price: 4,
+  });
 
-  componentDidMount() {
-    const query = new URLSearchParams(this.props.location.search);
+  useEffect(() => {
+    const query = new URLSearchParams(props.location.search);
     const ingredients = {};
     let price = 0;
 
@@ -23,43 +24,40 @@ class Checkout extends Component {
       }
     }
 
-    this.setState({ ingredients, price });
-  }
+    setState({ ingredients, price });
+  }, []);
 
-  cancelCheckoutHandler = () => this.props.history.goBack();
+  const cancelCheckoutHandler = () => props.history.goBack();
 
-  continueCheckoutHandler = () =>
-    this.props.history.replace('/checkout/contact-data');
+  const continueCheckoutHandler = () =>
+    props.history.replace('/checkout/contact-data');
 
-  render() {
-    let checkout = <div>Loading...</div>;
+  let checkout = <div>Loading...</div>;
 
-    if (this.state.ingredients) {
-      checkout = (
-        <CheckoutSummary
-          ingredients={this.state.ingredients}
-          cancelCheckout={this.cancelCheckoutHandler}
-          continueCheckout={this.continueCheckoutHandler}
-        />
-      );
-    }
-
-    return (
-      <React.Fragment>
-        {checkout}
-        <Route
-          path={`${this.props.match.url}/contact-data`}
-          exact
-          render={() => (
-            <ContactData
-              ingredients={this.state.ingredients}
-              price={this.state.price}
-            />
-          )}
-        />
-      </React.Fragment>
+  if (props.ingredients) {
+    checkout = (
+      <CheckoutSummary
+        ingredients={props.ingredients}
+        cancelCheckout={cancelCheckoutHandler}
+        continueCheckout={continueCheckoutHandler}
+      />
     );
   }
-}
 
-export default Checkout;
+  return (
+    <React.Fragment>
+      {checkout}
+      <Route
+        path={`${props.match.url}/contact-data`}
+        exact
+        component={ContactData}
+      />
+    </React.Fragment>
+  );
+};
+
+const mapStateToProps = state => ({
+  ingredients: state.ingredients.ingredients,
+});
+
+export default connect(mapStateToProps)(Checkout);

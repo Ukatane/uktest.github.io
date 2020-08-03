@@ -1,33 +1,64 @@
-import React from 'react';
-import { Route, Switch } from 'react-router-dom';
+import React, { useEffect, Suspense } from 'react';
+import { Route, Switch, Redirect, withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import Layout from './hoc/Layout/Layout';
 import BurgerBuilder from './containers/BurgerBuilder/BurgerBuilder';
-import Checkout from './containers/Checkout/Checkout';
-import Orders from './containers/Orders/Orders';
+// import Checkout from './containers/Checkout/Checkout';
+// import Orders from './containers/Orders/Orders';
+import Auth from './containers/Auth/Auth';
+import Logout from './containers/Auth/Logout/Logout.js';
+import store from './redux/store';
+import { authCheckState } from './redux/actions/auth';
+import { RadioSpinner } from './components/UI/Spinner/Spinner';
 
-class App extends React.Component {
-  render() {
-    return (
-      <div>
-        <Layout>
-          <Switch>
-            <Route path='/' exact component={BurgerBuilder} />
-            <Route path='/checkout' component={Checkout} />
-            <Route path='/orders' exact component={Orders} />
-            <Route
-              render={() => (
-                <div style={{ fontSize: 24, textAlign: 'center ' }}>
-                  {' '}
-                  Page not found{' '}
-                </div>
-              )}
-            />
-          </Switch>
-        </Layout>
-      </div>
+// lazy loading or code splitting
+const Checkout = React.lazy(() =>
+  import('./containers/Checkout/Checkout' /* Checkout chunk */)
+);
+const Orders = React.lazy(() =>
+  import('./containers/Orders/Orders' /* Orders chunk */)
+);
+
+const App = props => {
+  useEffect(() => {
+    store.dispatch(authCheckState());
+  }, []);
+
+  let routes = (
+    <Switch>
+      <Route path='/' exact component={BurgerBuilder} />
+      <Route path='/auth' exact component={Auth} />
+      <Redirect to='/' />
+    </Switch>
+  );
+
+  if (props.isAuthenticated) {
+    routes = (
+      <Switch>
+        <Route path='/' exact component={BurgerBuilder} />
+        <Route path='/auth' exact component={Auth} />
+        <Route path='/checkout' render={props => <Checkout {...props} />} />
+
+        {/* when using render in the route make sure to receive the route's props */}
+        <Route path='/orders' exact render={props => <Orders {...props} />} />
+        <Route path='/logout' exact component={Logout} />
+        <Redirect to='/' />
+      </Switch>
     );
   }
-}
 
-export default App;
+  return (
+    <div>
+      <Layout>
+        <Suspense fallback={<RadioSpinner />}>{routes}</Suspense>
+      </Layout>
+    </div>
+  );
+};
+
+const mapStateToProps = state => ({
+  isAuthenticated: state.auth.token !== null,
+});
+
+export default withRouter(connect(mapStateToProps)(App));

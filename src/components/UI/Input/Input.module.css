@@ -19,6 +19,8 @@
   margin: auto;
   padding: 6px 10px;
   display: block;
+  height: 42px;
+  border-radius: 5px;
   width: 80%;
   box-sizing: border-box;
 }
@@ -26,4 +28,9 @@
 .Input input:focus {
   outline: none;
   background-color: #ccc;
+}
+
+.Error {
+  border: 1px solid #ff3903;
+  background-color: #fbbcb5;
 }

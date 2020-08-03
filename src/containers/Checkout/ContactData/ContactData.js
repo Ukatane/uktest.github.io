@@ -1,14 +1,24 @@
-import React, { Component } from 'react';
-import { withRouter } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
 
 import axios from '../../../axios-orders';
 import classes from './ContactData.module.css';
 import Spinner from '../../../components/UI/Spinner/Spinner';
 import Button from '../../../components/UI/Button/Button';
 import Input from '../../../components/UI/Input/Input';
+import withAlertHandler from '../../../hoc/withAlertHandler/withAlertHandler';
+import { checkValidity } from '../../../shared/utils';
 
-class ContactData extends Component {
-  orderFormHelperFunc = (elN, elT = 'input', elCT = 'text', elCP, v = '') => {
+const ContactData = props => {
+  const orderFormHelperFunc = (
+    elN,
+    elT = 'input',
+    elCT = 'text',
+    elCP,
+    value = '',
+    minL = null,
+    maxL = null
+  ) => {
     return {
       elementName: elN,
       elementType: elT,
@@ -16,51 +26,66 @@ class ContactData extends Component {
         type: elCT,
         placeholder: elCP,
       },
-      value: v,
+      value: value,
       validation: {
         required: true,
+        minLength: minL,
+        maxLength: maxL,
       },
       isValid: false,
+      touched: false,
     };
   };
 
-  state = {
-    orderForm: {
-      name: this.orderFormHelperFunc('name', 'input', 'text', 'Your Name'),
-      street: this.orderFormHelperFunc(
-        'street',
-        'input',
-        'text',
-        'Your street'
-      ),
-      zipCode: this.orderFormHelperFunc(
-        'zipCode',
-        'input',
-        'text',
-        'Your postal code'
-      ),
-      country: this.orderFormHelperFunc(
-        'country',
-        'input',
-        'text',
-        'Your country'
-      ),
-      email: this.orderFormHelperFunc('email', 'input', 'text', 'Your email'),
-      deliveryMethod: {
-        elementName: 'deliveryMethod',
-        elementType: 'select',
-        elementConfig: {
-          options: [
-            { value: 'fastest', displayName: 'Fastest' },
-            { value: 'cheapest', displayName: 'Cheapest' },
-          ],
-        },
-        value: null,
+  const [orderForm, setOrderForm] = useState({
+    name: orderFormHelperFunc('name', 'input', 'text', 'Your Name'),
+    street: orderFormHelperFunc('street', 'input', 'text', 'Your street'),
+    zipCode: orderFormHelperFunc(
+      'zipCode',
+      'input',
+      'number',
+      'Your postal code',
+      '',
+      5,
+      8
+    ),
+    country: orderFormHelperFunc('country', 'input', 'text', 'Your country'),
+    email: orderFormHelperFunc('email', 'input', 'text', 'Your email'),
+    deliveryMethod: {
+      elementName: 'deliveryMethod',
+      elementType: 'select',
+      elementConfig: {
+        options: [
+          { value: 'fastest', displayName: 'Fastest' },
+          { value: 'cheapest', displayName: 'Cheapest' },
+        ],
       },
+      value: 'fastest',
     },
-    loading: false,
-  };
+  });
 
+  const [formIsValid, setFormIsValid] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  const { name, email, zipCode, street, country } = orderForm;
+
+  useEffect(() => {
+    if (
+      email.isValid &&
+      name.isValid &&
+      zipCode.isValid &&
+      street.isValid &&
+      country.isValid
+    ) {
+      setFormIsValid(false);
+    } else {
+      setFormIsValid(true);
+    }
+  }, [name, email, zipCode, street, country]);
+
+  // i outsourced checkValidity to the shared folder since its something i use all through my app
+
+  /*
   checkValidity = (value, rules) => {
     let isValid = false;
 
@@ -68,47 +93,49 @@ class ContactData extends Component {
       isValid = value.trim() !== '';
     }
 
+    if (rules.minLength) {
+      isValid = value.length >= rules.minLength;
+    }
+
     return isValid;
   };
+  */
 
-  orderHandler = async e => {
+  const orderHandler = async e => {
     e.preventDefault();
-
-    this.setState({ loading: true });
+    setLoading(true);
     const formData = {};
 
-    for (let key in this.state.orderForm) {
-      formData[key] = this.state.orderForm[key].value;
+    for (let key in orderForm) {
+      formData[key] = orderForm[key].value;
     }
 
     const order = {
-      ingredients: this.props.ingredients,
-      price: this.props.price,
+      ingredients: props.ingredients,
+      price: props.price,
       orderData: formData,
+      userId: props.userId,
     };
 
     try {
-      await axios.post(`/orders.json`, order);
+      await axios.post(`/orders.json?auth=${props.token}`, order);
 
-      this.props.history.push('/');
+      props.history.push('/');
 
-      this.setState({ loading: false, modal: false });
+      setLoading(false);
+      // setModal(false);
     } catch (err) {
-      this.setState({
-        loading: false,
-        modal: false,
-      });
-      console.log(err);
+      setLoading(false);
+      // setModal(false);
     }
   };
 
-  changeHandler = e => {
+  const changeHandler = e => {
     const handleInput = {
-      ...this.state.orderForm,
+      ...orderForm,
     };
 
     // deep clone
-    // might not be necessary here cause i eventually want to mutate the state
     handleInput[e.target.name] = {
       ...handleInput[e.target.name],
     };
@@ -119,64 +146,93 @@ class ContactData extends Component {
 
     handleInput[e.target.name].value = e.target.value;
 
-    handleInput[e.target.name].isValid = this.checkValidity(
+    handleInput[e.target.name].isValid = checkValidity(
       handleInput[e.target.name].value,
       handleInput[e.target.name].validation
     );
 
-    console.log(handleInput);
+    handleInput[e.target.name].touched = true;
 
-    this.setState({ orderForm: handleInput });
+    setOrderForm(handleInput);
+
+    // this.setState(
+    //   prevState => {
+    //     return { orderForm: handleInput };
+    //   },
+    //   () => {
+    //     const { name, email, zipCode, street, country } = orderForm;
+
+    //     if (
+    //       email.isValid &&
+    //       name.isValid &&
+    //       zipCode.isValid &&
+    //       street.isValid &&
+    //       country.isValid
+    //     ) {
+    //       setFormIsValid(false);
+    //     } else {
+    //       setFormIsValid(true);
+    //     }
+    //   }
+    // );
   };
 
-  render() {
-    const orderFormToArray = [];
+  const orderFormToArray = [];
 
-    const formInput = {
-      ...this.state.orderForm,
-    };
+  const formInput = {
+    ...orderForm,
+  };
 
-    for (let inp in formInput) {
-      orderFormToArray.push({
-        ...formInput[inp],
-      });
-    }
-
-    const orderForm = orderFormToArray.map((input, i) => {
-      return (
-        <Input
-          key={i}
-          inputtype={input.elementType}
-          type={input.elementConfig.type}
-          name={input.elementName}
-          placeholder={input.elementConfig.placeholder}
-          value={input.value}
-          options={input.elementConfig.options}
-          onChange={this.changeHandler}
-        />
-      );
+  for (let inp in formInput) {
+    orderFormToArray.push({
+      ...formInput[inp],
     });
-
-    let form = (
-      <form onSubmit={this.orderHandler}>
-        {orderForm}
-        <Button type='Success' clicked={this.orderHandler}>
-          ORDER
-        </Button>
-      </form>
-    );
-
-    if (this.state.loading) {
-      form = <Spinner />;
-    }
-
-    return (
-      <div className={classes.ContactData}>
-        <h4>Enter your Contact Data</h4>
-        {form}
-      </div>
-    );
   }
-}
 
-export default withRouter(ContactData);
+  const orderForms = orderFormToArray.map((input, i) => {
+    return (
+      <Input
+        key={i}
+        inputtype={input.elementType}
+        type={input.elementConfig.type}
+        name={input.elementName}
+        placeholder={input.elementConfig.placeholder}
+        value={input.value}
+        isValid={input.isValid}
+        inValid={!input.isValid}
+        touched={input.touched}
+        options={input.elementConfig.options}
+        onChange={changeHandler}
+      />
+    );
+  });
+
+  let form = (
+    <form onSubmit={orderHandler}>
+      {orderForms}
+      <Button type='Success' disabled={formIsValid} clicked={orderHandler}>
+        ORDER
+      </Button>
+    </form>
+  );
+
+  if (loading) {
+    form = <Spinner />;
+  }
+
+  return (
+    <div className={classes.ContactData}>
+      <h4>Enter your Contact Data</h4>
+      {form}
+    </div>
+  );
+};
+
+const mapStateToProps = state => ({
+  ingredients: state.ingredients.ingredients,
+  price: state.ingredients.totalPrice,
+  userId: state.auth.userId,
+  token: state.auth.token,
+});
+
+export default connect(mapStateToProps)(withAlertHandler(ContactData, axios));
